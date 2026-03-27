@@ -14,7 +14,11 @@
     "content_scripts": [
         {
             "matches": ["*://*.roll20.net/*"],
-            "js": ["Roll20_Tracker.js"]
+            "js": ["roll20-tracker.js"]
         }
+    ],
+
+    "host_permissions": [
+    "*://*.roll20.net/*"
     ]
 }
