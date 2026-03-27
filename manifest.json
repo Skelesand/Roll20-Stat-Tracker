@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Roll20 Stat Tracker",
+  "version": "1.0",
+  "description": "Tracks dice roll statistics in Roll20 games.",
+  
+  "content_scripts": [
+    {
+      "matches": [
+        "*://roll20.net/*"
+      ],
+      "js": ["roll20-stat-tracker.js"]
+    }
+  ],
+
+  "permissions": [],
+
+  "host_permissions": [
+    "*://roll20.net/*"
+  ]
+}
