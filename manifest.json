@@ -14,7 +14,7 @@
     "content_scripts": [
         {
             "matches": ["*://*.roll20.net/*"],
-            "js": ["roll20-tracker.js"]
+            "js": ["roll20-observer.js"]
         }
     ],
 
