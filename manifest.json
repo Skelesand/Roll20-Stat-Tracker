@@ -1,21 +1,20 @@
 {
-  "manifest_version": 3,
-  "name": "Roll20 Stat Tracker",
-  "version": "1.0",
-  "description": "Tracks dice roll statistics in Roll20 games.",
-  
-  "content_scripts": [
-    {
-      "matches": [
-        "*://roll20.net/*"
-      ],
-      "js": ["roll20-stat-tracker.js"]
-    }
-  ],
+    "manifest_version": 3,
+    "name": "Roll20 Stat Tracker",
+    "version": "1.0",
 
-  "permissions": [],
+    "description": "A Firefox extension to track dice roll stats for Roll20 games.",
 
-  "host_permissions": [
-    "*://roll20.net/*"
-  ]
+    "browser_specific_settings": {
+    "gecko": {
+            "id": "roll20-stat-tracker@esander.dev"
+        }
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["*://*.roll20.net/*"],
+            "js": ["Roll20_Tracker.js"]
+        }
+    ]
 }
