@@ -9,16 +9,22 @@
     const playerStats = {};
 
     // UI panel
-    // UI panel
-    function createStatsPanel() {
+    function getExpectedValue(die) {
+        const sides = parseInt(die.replace('d', ''), 10);
+        if (!isNaN(sides)) {
+            return (sides + 1) / 2;
+        }
+        return null;
+    }
+
+    function createStatsPanel() {  
         let panel = document.getElementById('roll20-stats-panel');
         if (!panel) {
-            // Outer panel
             panel = document.createElement('div');
             panel.id = 'roll20-stats-panel';
             panel.style.position = 'fixed';
             panel.style.top = '10px';
-            panel.style.left = 'calc(100% - 260px)'; // start near the right
+            panel.style.left = 'calc(100% - 260px)';
             panel.style.width = '250px';
             panel.style.backgroundColor = 'rgba(0,0,0,0.8)';
             panel.style.color = 'white';
@@ -27,9 +33,7 @@
             panel.style.padding = '5px';
             panel.style.borderRadius = '8px';
             panel.style.zIndex = 10000;
-            panel.style.right = 'auto';
-
-            // Header (clickable)
+    
             const header = document.createElement('div');
             header.id = 'roll20-stats-header';
             header.textContent = 'Roll Averages ⬇';
@@ -37,16 +41,13 @@
             header.style.fontWeight = 'bold';
             header.style.marginBottom = '5px';
             panel.appendChild(header);
-
-            // Content container (collapsible)
+    
             const content = document.createElement('div');
             content.id = 'roll20-stats-content';
             content.style.maxHeight = '300px';
             content.style.overflowY = 'auto';
-            content.style.display = 'block'; // start expanded
             panel.appendChild(content);
 
-            // Click to toggle collapse
             header.addEventListener('click', () => {
                 if (content.style.display === 'none') {
                     content.style.display = 'block';
@@ -56,27 +57,21 @@
                     header.textContent = 'Roll Averages ➤';
                 }
             });
-
-            // Start New Session button
+    
             const newSessionBtn = document.createElement('button');
             newSessionBtn.textContent = 'Start New Session';
             newSessionBtn.style.marginTop = '5px';
             newSessionBtn.style.width = '100%';
-            newSessionBtn.style.padding = '4px';
-            newSessionBtn.style.fontSize = '13px';
             newSessionBtn.style.cursor = 'pointer';
-            newSessionBtn.addEventListener('click', () => {
-                // Reset all stats
+            newSessionBtn.onclick = () => {
                 for (const player in playerStats) {
                     delete playerStats[player];
                 }
-                updateStatsPanel(); // refresh the panel
-            });
+                updateStatsPanel();
+            };
             panel.appendChild(newSessionBtn);
-
+    
             document.body.appendChild(panel);
-
-            // makes the stats panel draggable
             makePanelDraggable(panel);
         }
         return panel;
@@ -86,30 +81,66 @@
         const panel = createStatsPanel();
         const content = document.getElementById('roll20-stats-content');
         if (!content) return;
-
-        // Build stats HTML
+    
         let html = '';
+    
         for (const player in playerStats) {
-            html += `<strong>${player}</strong><br>`;
+            const playerId = player.replace(/\s+/g, '_'); // safe ID
+    
+            html += `
+                <div class="player-section">
+                    <div class="player-header" data-player="${playerId}" style="cursor:pointer; font-weight:bold;">
+                        ${player} ⬇
+                    </div>
+                    <div class="player-content" id="player-${playerId}">
+            `;
+    
             const dice = playerStats[player];
-
-            // Convert dice object to array and sort by die size descending
             const sortedDice = Object.keys(dice).sort((a, b) => {
-                // Extract numeric part of die, fallback to 0 for unknown
                 const numA = parseInt(a.replace('d', ''), 10) || 0;
                 const numB = parseInt(b.replace('d', ''), 10) || 0;
-                return numB - numA; // largest first
+                return numB - numA;
             });
-
+    
             sortedDice.forEach(die => {
                 const stat = dice[die];
-                html += `${die}: Avg ${stat.average.toFixed(2)} (Rolled ${stat.count} times)<br>`;
+    
+                const expected = getExpectedValue(die);
+                const diff = stat.average - expected;
+    
+                let color = 'white';
+                if (expected !== null) {
+                    if (diff > 0.5) color = '#4caf50';     // green
+                    else if (diff < -0.5) color = '#f44336'; // red
+                }
+    
+                html += `
+                    <div style="color:${color}">
+                        ${die}: Avg ${stat.average.toFixed(2)} (Rolled ${stat.count} times)
+                    </div>
+                `;
             });
-
-            html += '<hr>';
+    
+            html += `</div><hr></div>`;
         }
-
+    
         content.innerHTML = html;
+    
+        // Attach collapse behavior
+        document.querySelectorAll('.player-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const playerId = header.dataset.player;
+                const section = document.getElementById(`player-${playerId}`);
+    
+                if (section.style.display === 'none') {
+                    section.style.display = 'block';
+                    header.textContent = header.textContent.replace('➤', '⬇');
+                } else {
+                    section.style.display = 'none';
+                    header.textContent = header.textContent.replace('⬇', '➤');
+                }
+            });
+        });
     }
 
     // makes the stats panel draggable
