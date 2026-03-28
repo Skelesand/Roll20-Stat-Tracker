@@ -6,8 +6,12 @@
     "description": "A Firefox extension to track dice roll stats for Roll20 games.",
 
     "browser_specific_settings": {
-    "gecko": {
-            "id": "roll20-stat-tracker@esander.dev"
+        "gecko": {
+            "id": "roll20-stat-tracker@esander.dev",
+            "data_collection_permissions": {
+                "required": ["none"],
+                "optional": []
+            }
         }
     },
 
@@ -19,6 +23,6 @@
     ],
 
     "host_permissions": [
-    "*://*.roll20.net/*"
+        "*://*.roll20.net/*"
     ]
 }
